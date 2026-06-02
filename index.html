@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reto de Clicks</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <section id="start-screen" class="panel">
+      <h1>Reto de Clicks</h1>
+      <p class="subtitle">Escribe tu nombre y pulsa tantas veces como puedas durante 10 segundos.</p>
+
+      <form id="start-form" class="start-form">
+        <label for="player-name">Tu nombre</label>
+        <input id="player-name" name="player-name" type="text" maxlength="20" autocomplete="off" required>
+        <button type="submit">Comenzar partida</button>
+      </form>
+    </section>
+
+    <section id="game-screen" class="game-screen hidden" aria-live="polite">
+      <div class="hud">
+        <div>
+          <span class="hud-label">Tiempo</span>
+          <strong id="timer">00:10</strong>
+        </div>
+        <div>
+          <span class="hud-label">Clicks</span>
+          <strong id="click-count">0</strong>
+        </div>
+      </div>
+
+      <button id="click-button" class="click-button" type="button">CLIC</button>
+    </section>
+
+    <section id="end-screen" class="panel hidden">
+      <h2>Terminado</h2>
+      <p id="final-score" class="final-score"></p>
+
+      <div class="ranking-card">
+        <h3>Ranking</h3>
+        <ol id="ranking-list" class="ranking-list"></ol>
+      </div>
+
+      <button id="play-again" type="button">Volver a jugar</button>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
