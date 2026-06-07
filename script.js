@@ -1,6 +1,7 @@
 const GAME_SECONDS = 10;
 const RANKING_KEY = "click-game-ranking";
 
+const API_URL = "https://la-teva-funcio.azurewebsites.net/api";
 const startScreen = document.querySelector("#start-screen");
 const gameScreen = document.querySelector("#game-screen");
 const endScreen = document.querySelector("#end-screen");
@@ -45,6 +46,7 @@ playAgainButton.addEventListener("click", () => {
 });
 
 function startGame() {
+  document.getElementById("bg-music").play();
   clicks = 0;
   secondsLeft = GAME_SECONDS;
   clickCountElement.textContent = "0";
@@ -62,13 +64,14 @@ function startGame() {
   }, 1000);
 }
 
-function finishGame() {
+async function finishGame() {
   clearInterval(timerId);
   timerId = null;
 
-  saveScore(playerName, clicks);
+  await saveScore(playerName, clicks);
   finalScore.textContent = `${playerName}, has hecho ${clicks} clicks.`;
-  renderRanking();
+  await renderRanking();
+  
   showScreen(endScreen);
 }
 
@@ -84,20 +87,33 @@ function formatTime(totalSeconds) {
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
-function getRanking() {
-  const savedRanking = localStorage.getItem(RANKING_KEY);
-  return savedRanking ? JSON.parse(savedRanking) : [];
+async function getRanking() {
+  try {
+    const response = await fetch(`${API_URL}/getRanking`);
+    if (!response.ok) throw new Error("Error a la xarxa");
+    return await response.json();
+  } catch (error) {
+    console.error("Error carregant el rànquing:", error);
+    return []; // Si falla, retorna una llista buida
+  }
 }
 
-function saveScore(name, score) {
-  const ranking = getRanking();
-  ranking.push({ name, score });
-  ranking.sort((a, b) => b.score - a.score);
-  localStorage.setItem(RANKING_KEY, JSON.stringify(ranking.slice(0, 10)));
+async function saveScore(name, score) {
+  try {
+    await fetch(`${API_URL}/saveScore`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, score })
+    });
+  } catch (error) {
+    console.error("Error desant la puntuació:", error);
+  }
 }
 
-function renderRanking() {
-  const ranking = getRanking();
+async function renderRanking() {
+  rankingList.innerHTML = "<li>Cargando puntuaciones...</li>"; // Missatge de càrrega
+  
+  const ranking = await getRanking(); // Crida a la base de dades
   rankingList.innerHTML = "";
 
   if (ranking.length === 0) {
